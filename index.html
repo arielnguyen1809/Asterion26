@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asterion Professional Astrology Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        asterion: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                            gold: '#fbbf24',
+                            accent: '#8b5cf6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .lesson-content h1 { font-size: 1.8rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.5rem; }
+        .lesson-content h2 { font-size: 1.5rem; font-weight: 600; color: #e2e8f0; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+        .lesson-content h3 { font-size: 1.25rem; font-weight: 500; color: #cbd5e1; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .lesson-content p { margin-bottom: 1rem; line-height: 1.7; color: #94a3b8; }
+        .lesson-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #94a3b8; }
+        .lesson-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; color: #94a3b8; }
+        .lesson-content li { margin-bottom: 0.5rem; }
+        .lesson-content .highlight-box { background: rgba(139, 92, 246, 0.1); border-left: 4px solid #8b5cf6; padding: 1rem; margin: 1.5rem 0; border-radius: 0 0.5rem 0.5rem 0; }
+        .lesson-content strong { color: #e2e8f0; font-weight: 600; }
+        .lesson-content .flow-diagram { background: #1e293b; padding: 1rem; border-radius: 0.5rem; text-align: center; margin: 1rem 0; font-family: monospace; color: #fbbf24; white-space: pre; font-size: 0.9rem;}
+        .lesson-content blockquote { border-left: 3px solid #475569; padding-left: 1rem; margin: 1rem 0; color: #cbd5e1; font-style: italic; }
+        .lesson-content code { background: #1e293b; padding: 0.15rem 0.4rem; border-radius: 0.25rem; color: #fbbf24; font-size: 0.9em; }
+        .lesson-content pre { background: #1e293b; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; }
+        .lesson-content pre code { background: transparent; padding: 0; }
+        .lesson-content a { color: #8b5cf6; text-decoration: underline; }
+        .lesson-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .lesson-content th, .lesson-content td { border: 1px solid #334155; padding: 0.5rem 0.75rem; text-align: left; }
+        .lesson-content th { background: #1e293b; color: #e2e8f0; }
+    </style>
+</head>
+<body class="bg-asterion-900 text-slate-300 font-sans h-screen flex overflow-hidden antialiased">
+
+    <!-- Mobile Menu Button -->
+    <div class="md:hidden absolute top-4 left-4 z-50">
+        <button id="mobile-menu-btn" class="text-slate-300 hover:text-white p-2 bg-asterion-800 rounded-md">
+            <i class="fas fa-bars text-lg"></i>
+        </button>
+    </div>
+    <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-30 md:hidden" onclick="toggleMobileMenu(true)"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed md:static z-40 w-72 h-full bg-asterion-800 border-r border-asterion-700 flex flex-col -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <div class="p-5 border-b border-asterion-700">
+            <h1 class="text-lg font-bold text-white flex items-center gap-2">
+                <i class="fas fa-star-of-life text-asterion-gold"></i> Asterion
+            </h1>
+            <p class="text-xs text-slate-500 mt-1">Professional Astrology Academy</p>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-3">
+            <div class="flex items-center justify-between px-2 mb-2">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Module 0 · Foundations</span>
+                <button onclick="refreshLessons()" title="Tải lại danh sách từ GitHub" class="text-slate-500 hover:text-asterion-gold text-xs">
+                    <i class="fas fa-rotate"></i>
+                </button>
+            </div>
+            <div id="lesson-list" class="space-y-1">
+                <div class="text-xs text-slate-600 px-3 py-2 italic">Đang tải danh sách bài học...</div>
+            </div>
+        </div>
+
+        <div id="sync-status" class="p-3 border-t border-asterion-700 text-[11px] text-slate-600"></div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 overflow-y-auto">
+        <div id="content-container" class="max-w-3xl mx-auto px-6 md:px-10 py-10 md:py-14 transition-opacity duration-300 opacity-100">
+            <div id="lesson-module-tag" class="text-xs font-semibold text-asterion-accent uppercase tracking-wider mb-2">Module 0</div>
+            <h1 id="lesson-title" class="text-2xl md:text-3xl font-bold text-white mb-1">Đang tải...</h1>
+            <p id="lesson-subtitle" class="text-slate-500 mb-8"></p>
+            <div id="lesson-body" class="lesson-content"></div>
+        </div>
+    </main>
+
+    <script>
+        // ====== CONFIG ======
+        const GITHUB_OWNER = 'arielnguyen1809';
+        const GITHUB_REPO = 'Asterion';
+        const LESSONS_PATH = 'lessons';
+        const CACHE_KEY = 'asterion_lessons_cache_v1';
+        const CACHE_TTL_MS = 5 * 60 * 1000; // 5 phút
+
+        let lessons = [];
+        let activeLessonId = null;
+
+        marked.setOptions({ breaks: true, gfm: true });
+
+        async function init() {
+            const cached = readCache();
+            if (cached) {
+                lessons = cached.lessons;
+                renderSidebar();
+                loadLesson(lessons[0]?.id);
+                setSyncStatus(`Đã tải từ cache lúc ${new Date(cached.fetchedAt).toLocaleTimeString()}`);
+                // refresh silently in background if cache stale-ish
+                if (Date.now() - cached.fetchedAt > CACHE_TTL_MS) {
+                    fetchLessons(false);
+                }
+            } else {
+                await fetchLessons(true);
+            }
+        }
+
+        async function refreshLessons() {
+            await fetchLessons(true);
+        }
+
+        async function fetchLessons(showLoadingUI) {
+            if (showLoadingUI) {
+                document.getElementById('lesson-list').innerHTML = '<div class="text-xs text-slate-600 px-3 py-2 italic">Đang tải danh sách bài học...</div>';
+                setSyncStatus('Đang đồng bộ với GitHub...');
+            }
+            try {
+                const listUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${LESSONS_PATH}`;
+                const res = await fetch(listUrl);
+                if (!res.ok) throw new Error(`GitHub API lỗi: ${res.status}`);
+                const files = await res.json();
+
+                const mdFiles = files.filter(f => f.type === 'file' && /^\d+\.\d+\.md$/i.test(f.name));
+                mdFiles.sort((a, b) => {
+                    const [am, al] = a.name.replace('.md', '').split('.').map(Number);
+                    const [bm, bl] = b.name.replace('.md', '').split('.').map(Number);
+                    return am !== bm ? am - bm : al - bl;
+                });
+
+                const loaded = await Promise.all(mdFiles.map(async f => {
+                    const id = f.name.replace('.md', '');
+                    const raw = await (await fetch(f.download_url)).text();
+                    return parseLesson(id, raw);
+                }));
+
+                lessons = loaded;
+                writeCache(lessons);
+                renderSidebar();
+                if (!activeLessonId && lessons.length) loadLesson(lessons[0].id);
+                setSyncStatus(`Đồng bộ lúc ${new Date().toLocaleTimeString()} · ${lessons.length} bài`);
+            } catch (err) {
+                console.error(err);
+                setSyncStatus(`⚠ Lỗi tải từ GitHub: ${err.message}`);
+                if (lessons.length === 0) {
+                    document.getElementById('lesson-list').innerHTML = '<div class="text-xs text-red-400 px-3 py-2">Không tải được danh sách bài học. Kiểm tra kết nối hoặc tên repo.</div>';
+                }
+            }
+        }
+
+        function parseLesson(id, raw) {
+            const lines = raw.replace(/\r\n/g, '\n').split('\n');
+            let i = 0;
+            let title = `Lesson ${id}`;
+            let subtitle = '';
+
+            if (lines[i] && lines[i].startsWith('# ')) {
+                title = lines[i].slice(2).trim();
+                i++;
+            }
+            while (lines[i] === '') i++;
+            if (lines[i] && lines[i].startsWith('> ')) {
+                subtitle = lines[i].slice(2).trim();
+                i++;
+            }
+            while (lines[i] === '') i++;
+
+            const bodyMarkdown = lines.slice(i).join('\n');
+            const bodyHtml = marked.parse(bodyMarkdown);
+
+            return { id, title, subtitle, bodyHtml };
+        }
+
+        function renderSidebar() {
+            const listEl = document.getElementById('lesson-list');
+            listEl.innerHTML = '';
+
+            if (lessons.length === 0) {
+                listEl.innerHTML = '<div class="text-xs text-slate-600 px-3 py-2 italic">Chưa có bài học nào trong /lessons.</div>';
+                return;
+            }
+
+            lessons.forEach(lesson => {
+                const isActive = lesson.id === activeLessonId;
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${isActive ? 'bg-asterion-accent/20 text-asterion-accent border border-asterion-accent/30' : 'text-slate-400 hover:bg-asterion-700/50 hover:text-slate-200 border border-transparent'}`;
+                btn.innerHTML = `<i class="${isActive ? 'fas fa-book-open' : 'fas fa-book'} w-4 text-center"></i> <span class="truncate">${escapeHtml(lesson.title.split(':')[0])}</span>`;
+                btn.onclick = () => loadLesson(lesson.id);
+                listEl.appendChild(btn);
+            });
+        }
+
+        function loadLesson(id) {
+            activeLessonId = id;
+            renderSidebar();
+
+            const container = document.getElementById('content-container');
+            container.classList.remove('opacity-100');
+            container.classList.add('opacity-0');
+
+            setTimeout(() => {
+                const lesson = lessons.find(l => l.id === id);
+                if (lesson) {
+                    document.getElementById('lesson-module-tag').textContent = `Module ${id.split('.')[0]}`;
+                    document.getElementById('lesson-title').textContent = lesson.title;
+                    document.getElementById('lesson-subtitle').textContent = lesson.subtitle || '';
+                    document.getElementById('lesson-subtitle').style.display = lesson.subtitle ? 'block' : 'none';
+                    document.getElementById('lesson-body').innerHTML = lesson.bodyHtml;
+                }
+                container.classList.remove('opacity-0');
+                container.classList.add('opacity-100');
+                if (window.innerWidth < 768) toggleMobileMenu(true);
+                document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+            }, 200);
+        }
+
+        function readCache() {
+            try {
+                const raw = localStorage.getItem(CACHE_KEY);
+                if (!raw) return null;
+                return JSON.parse(raw);
+            } catch (e) { return null; }
+        }
+
+        function writeCache(lessons) {
+            try {
+                localStorage.setItem(CACHE_KEY, JSON.stringify({ fetchedAt: Date.now(), lessons }));
+            } catch (e) { /* storage full or unavailable, ignore */ }
+        }
+
+        function setSyncStatus(text) {
+            document.getElementById('sync-status').textContent = text;
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function toggleMobileMenu(forceClose = false) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (forceClose || sidebar.classList.contains('translate-x-0')) {
+                sidebar.classList.remove('translate-x-0');
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => toggleMobileMenu());
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
