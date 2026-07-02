@@ -1,2 +1,0 @@
-# Asterion26
-Test
